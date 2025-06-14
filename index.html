@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Life Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .date-time-display {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .current-time {
+            font-weight: bold;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .nav-tab.active {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card h3 {
+            color: #5a67d8;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .habit-item, .routine-item, .chore-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #5a67d8;
+        }
+
+        .habit-item:hover, .routine-item:hover, .chore-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .habit-item.completed {
+            background: #f0fff4;
+            border-left-color: #48bb78;
+        }
+
+        .streak-counter {
+            background: #5a67d8;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #5a67d8;
+        }
+
+        .add-button {
+            background: #5a67d8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .add-button:hover {
+            background: #4c51bf;
+            transform: translateY(-2px);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-group input, .input-group select {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #5a67d8;
+        }
+
+        .mood-selector {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .mood-btn {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 24px;
+        }
+
+        .mood-btn.selected {
+            border-color: #5a67d8;
+            background: #5a67d8;
+            color: white;
+        }
+
+        .journal-entry {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .journal-entry:focus {
+            outline: none;
+            border-color: #5a67d8;
+        }
+
+        .budget-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .budget-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .budget-amount {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .delete-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #c53030;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .date-time-display {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                min-width: 100%;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .input-group input, .input-group select {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Daily Life Hub</h1>
+            <div class="date-time-display">
+                <div id="currentDate"></div>
+                <div class="current-time" id="currentTime"></div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('habits')">Habits</button>
+            <button class="nav-tab" onclick="showSection('routines')">Routines</button>
+            <button class="nav-tab" onclick="showSection('journal')">Journal</button>
+            <button class="nav-tab" onclick="showSection('chores')">Chores</button>
+            <button class="nav-tab" onclick="showSection('budget')">Budget</button>
+        </div>
+
+        <!-- Habits Section -->
+        <div id="habits" class="content-section active">
+            <div class="card">
+                <h3>🎯 Daily Habits</h3>
+                <div id="habitsList"></div>
+                <div class="input-group">
+                    <input type="text" id="newHabit" placeholder="Enter new habit">
+                    <button class="add-button" onclick="addHabit()">Add Habit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Routines Section -->
+        <div id="routines" class="content-section">
+            <div class="card">
+                <h3>🌅 Morning Routine</h3>
+                <div id="morningRoutineList"></div>
+                <div class="input-group">
+                    <input type="text" id="newMorningTask" placeholder="Enter morning task">
+                    <button class="add-button" onclick="addRoutineTask('morning')">Add Task</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>🌙 Evening Routine</h3>
+                <div id="eveningRoutineList"></div>
+                <div class="input-group">
+                    <input type="text" id="newEveningTask" placeholder="Enter evening task">
+                    <button class="add-button" onclick="addRoutineTask('evening')">Add Task</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Journal Section -->
+        <div id="journal" class="content-section">
+            <div class="card">
+                <h3>📝 Daily Reflection</h3>
+                <div>
+                    <h4>How are you feeling today?</h4>
+                    <div class="mood-selector">
+                        <button class="mood-btn" onclick="selectMood('😊')" data-mood="happy">😊</button>
+                        <button class="mood-btn" onclick="selectMood('😐')" data-mood="neutral">😐</button>
+                        <button class="mood-btn" onclick="selectMood('😔')" data-mood="sad">😔</button>
+                        <button class="mood-btn" onclick="selectMood('😴')" data-mood="tired">😴</button>
+                        <button class="mood-btn" onclick="selectMood('😤')" data-mood="stressed">😤</button>
+                        <button class="mood-btn" onclick="selectMood('🤔')" data-mood="thoughtful">🤔</button>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4>What went well today?</h4>
+                    <textarea class="journal-entry" id="journalWell" placeholder="Write about something positive from your day..."></textarea>
+                </div>
+                
+                <div>
+                    <h4>What could be improved?</h4>
+                    <textarea class="journal-entry" id="journalImprove" placeholder="Reflect on areas for growth..."></textarea>
+                </div>
+                
+                <button class="add-button" onclick="saveJournalEntry()">Save Entry</button>
+            </div>
+        </div>
+
+        <!-- Chores Section -->
+        <div id="chores" class="content-section">
+            <div class="card">
+                <h3>🏠 Household Chores</h3>
+                <div id="choresList"></div>
+                <div class="input-group">
+                    <input type="text" id="newChore" placeholder="Enter chore">
+                    <select id="choreAssignee">
+                        <option value="">Assign to...</option>
+                        <option value="Me">Me</option>
+                        <option value="Partner">Partner</option>
+                        <option value="Family">Family</option>
+                    </select>
+                    <button class="add-button" onclick="addChore()">Add Chore</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget Section -->
+        <div id="budget" class="content-section">
+            <div class="card">
+                <h3>💰 Daily Budget Tracker</h3>
+                <div class="budget-summary">
+                    <div class="budget-card">
+                        <div class="budget-amount" id="dailyBudget">$0</div>
+                        <div>Daily Budget</div>
+                    </div>
+                    <div class="budget-card">
+                        <div class="budget-amount" id="todaySpent">$0</div>
+                        <div>Today's Spending</div>
+                    </div>
+                    <div class="budget-card">
+                        <div class="budget-amount" id="remaining">$0</div>
+                        <div>Remaining</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <input type="number" id="budgetAmount" placeholder="Set daily budget" step="0.01">
+                    <button class="add-button" onclick="setBudget()">Set Budget</button>
+                </div>
+                
+                <div id="expensesList"></div>
+                
+                <div class="input-group">
+                    <input type="text" id="expenseDescription" placeholder="What did you buy?">
+                    <input type="number" id="expenseAmount" placeholder="Amount" step="0.01">
+                    <button class="add-button" onclick="addExpense()">Add Expense</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let data = {
+            habits: [
+                { name: "Drink 8 glasses of water", streak: 5, completed: false },
+                { name: "Read for 30 minutes", streak: 3, completed: false },
+                { name: "Exercise", streak: 7, completed: false }
+            ],
+            morningRoutine: [
+                { task: "Wake up at 7:00 AM", completed: false },
+                { task: "Drink water", completed: false },
+                { task: "Morning meditation", completed: false }
+            ],
+            eveningRoutine: [
+                { task: "Plan tomorrow", completed: false },
+                { task: "Read", completed: false },
+                { task: "Sleep by 11 PM", completed: false }
+            ],
+            chores: [
+                { task: "Take out trash", assignee: "Me", completed: false },
+                { task: "Do laundry", assignee: "Partner", completed: false }
+            ],
+            budget: {
+                daily: 50,
+                expenses: []
+            },
+            journal: {
+                mood: null,
+                well: "",
+                improve: ""
+            }
+        };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            loadHabits();
+            loadRoutines();
+            loadChores();
+            loadBudget();
+            
+            // Update time every second
+            setInterval(updateDateTime, 1000);
+        });
+
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Update date
+            const dateOptions = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', dateOptions);
+            
+            // Update time
+            const timeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', timeOptions);
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Habits functionality
+        function loadHabits() {
+            const habitsList = document.getElementById('habitsList');
+            habitsList.innerHTML = data.habits.map((habit, index) => `
+                <div class="habit-item ${habit.completed ? 'completed' : ''}">
+                    <div style="display: flex; align-items: center;">
+                        <input type="checkbox" class="checkbox" ${habit.completed ? 'checked' : ''} 
+                               onchange="toggleHabit(${index})">
+                        <span>${habit.name}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="streak-counter">${habit.streak} days</span>
+                        <button class="delete-btn" onclick="deleteHabit(${index})">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addHabit() {
+            const input = document.getElementById('newHabit');
+            if (input.value.trim()) {
+                data.habits.push({
+                    name: input.value.trim(),
+                    streak: 0,
+                    completed: false
+                });
+                input.value = '';
+                loadHabits();
+            }
+        }
+
+        function toggleHabit(index) {
+            data.habits[index].completed = !data.habits[index].completed;
+            if (data.habits[index].completed) {
+                data.habits[index].streak++;
+            }
+            loadHabits();
+        }
+
+        function deleteHabit(index) {
+            data.habits.splice(index, 1);
+            loadHabits();
+        }
+
+        // Routines functionality
+        function loadRoutines() {
+            loadRoutineList('morning', 'morningRoutineList');
+            loadRoutineList('evening', 'eveningRoutineList');
+        }
+
+        function loadRoutineList(type, containerId) {
+            const container = document.getElementById(containerId);
+            const routineKey = type + 'Routine';
+            container.innerHTML = data[routineKey].map((item, index) => `
+                <div class="routine-item ${item.completed ? 'completed' : ''}">
+                    <div style="display: flex; align-items: center;">
+                        <input type="checkbox" class="checkbox" ${item.completed ? 'checked' : ''} 
+                               onchange="toggleRoutineTask('${type}', ${index})">
+                        <span>${item.task}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteRoutineTask('${type}', ${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function addRoutineTask(type) {
+            const input = document.getElementById(`new${type.charAt(0).toUpperCase() + type.slice(1)}Task`);
+            if (input.value.trim()) {
+                const routineKey = type + 'Routine';
+                data[routineKey].push({
+                    task: input.value.trim(),
+                    completed: false
+                });
+                input.value = '';
+                loadRoutines();
+            }
+        }
+
+        function toggleRoutineTask(type, index) {
+            const routineKey = type + 'Routine';
+            data[routineKey][index].completed = !data[routineKey][index].completed;
+            loadRoutines();
+        }
+
+        function deleteRoutineTask(type, index) {
+            const routineKey = type + 'Routine';
+            data[routineKey].splice(index, 1);
+            loadRoutines();
+        }
+
+        // Journal functionality
+        function selectMood(emoji) {
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            data.journal.mood = emoji;
+        }
+
+        function saveJournalEntry() {
+            data.journal.well = document.getElementById('journalWell').value;
+            data.journal.improve = document.getElementById('journalImprove').value;
+            alert('Journal entry saved!');
+        }
+
+        // Chores functionality
+        function loadChores() {
+            const choresList = document.getElementById('choresList');
+            choresList.innerHTML = data.chores.map((chore, index) => `
+                <div class="chore-item ${chore.completed ? 'completed' : ''}">
+                    <div style="display: flex; align-items: center;">
+                        <input type="checkbox" class="checkbox" ${chore.completed ? 'checked' : ''} 
+                               onchange="toggleChore(${index})">
+                        <span>${chore.task}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="background: #e2e8f0; padding: 4px 8px; border-radius: 12px; font-size: 12px;">
+                            ${chore.assignee}
+                        </span>
+                        <button class="delete-btn" onclick="deleteChore(${index})">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addChore() {
+            const taskInput = document.getElementById('newChore');
+            const assigneeSelect = document.getElementById('choreAssignee');
+            
+            if (taskInput.value.trim() && assigneeSelect.value) {
+                data.chores.push({
+                    task: taskInput.value.trim(),
+                    assignee: assigneeSelect.value,
+                    completed: false
+                });
+                taskInput.value = '';
+                assigneeSelect.value = '';
+                loadChores();
+            }
+        }
+
+        function toggleChore(index) {
+            data.chores[index].completed = !data.chores[index].completed;
+            loadChores();
+        }
+
+        function deleteChore(index) {
+            data.chores.splice(index, 1);
+            loadChores();
+        }
+
+        // Budget functionality
+        function loadBudget() {
+            document.getElementById('dailyBudget').textContent = `$${data.budget.daily}`;
+            
+            const todaySpent = data.budget.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            document.getElementById('todaySpent').textContent = `$${todaySpent.toFixed(2)}`;
+            
+            const remaining = data.budget.daily - todaySpent;
+            document.getElementById('remaining').textContent = `$${remaining.toFixed(2)}`;
+            document.getElementById('remaining').style.color = remaining >= 0 ? '#48bb78' : '#e53e3e';
+            
+            loadExpenses();
+        }
+
+        function setBudget() {
+            const budgetInput = document.getElementById('budgetAmount');
+            const amount = parseFloat(budgetInput.value);
+            
+            if (amount > 0) {
+                data.budget.daily = amount;
+                budgetInput.value = '';
+                loadBudget();
+            }
+        }
+
+        function addExpense() {
+            const descInput = document.getElementById('expenseDescription');
+            const amountInput = document.getElementById('expenseAmount');
+            
+            const description = descInput.value.trim();
+            const amount = parseFloat(amountInput.value);
+            
+            if (description && amount > 0) {
+                data.budget.expenses.push({
+                    description: description,
+                    amount: amount,
+                    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+                });
+                
+                descInput.value = '';
+                amountInput.value = '';
+                loadBudget();
+            }
+        }
+
+        function loadExpenses() {
+            const expensesList = document.getElementById('expensesList');
+            expensesList.innerHTML = data.budget.expenses.map((expense, index) => `
+                <div class="expense-item">
+                    <div>
+                        <strong>${expense.description}</strong>
+                        <div style="font-size: 12px; color: #666;">${expense.time}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-weight: bold;">$${expense.amount.toFixed(2)}</span>
+                        <button class="delete-btn" onclick="deleteExpense(${index})">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteExpense(index) {
+            data.budget.expenses.splice(index, 1);
+            loadBudget();
+        }
+    </script>
+</body>
+</html>
